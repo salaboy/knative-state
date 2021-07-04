@@ -1,0 +1,25 @@
+domain: com.salaboy
+layout:
+- go.kubebuilder.io/v3
+projectName: knative-workflow
+repo: github.com/salaboy/knative-workflow
+resources:
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: dev.knative
+  group: workflow
+  kind: Workflow
+  path: github.com/salaboy/knative-workflow/api/v1
+  version: v1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: dev.knative
+  group: workflow
+  kind: WorkflowRun
+  path: github.com/salaboy/knative-workflow/api/v1
+  version: v1
+version: "3"

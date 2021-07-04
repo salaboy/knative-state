@@ -1,0 +1,30 @@
+apiVersion: workflow.knative.dev/v1
+kind: Workflow
+metadata:
+  name: buy-tickets-workflow
+spec:
+  workflow:
+    id: buy-tickets-workflow
+    name: buy-tickets-workflow
+    version: "1.0.0"
+    states:
+      "":
+        events:
+          JoinedQueue: InQueue
+      InQueue:
+        events:
+          ExitedQueue: BuyingTickets
+          AbandonedQueue: NoTicketsPurchased
+      BuyingTickets:
+        events:
+          TicketsReserved: PayingTickets
+      PayingTickets:
+        events:
+          PaymentRequested: WaitingForPaymentAuth
+      WaitingForPaymentAuth:
+        events:
+          PaymentAuthorized: TicketsPurchased
+      TicketsPurchased:
+        events: { }
+      NoTicketsPurchased:
+        events: { }
