@@ -37,30 +37,38 @@ spec:
             description: WorkflowSpec defines the desired state of Workflow
             properties:
               workflow:
+                description: '@TODO: delete from here This comes from WorkflowRunner'
                 properties:
                   id:
                     type: string
                   name:
                     type: string
-                  states:
-                    additionalProperties:
-                      description: State binds a state with an action and a set of
-                        events it can handle.
-                      properties:
-                        events:
-                          additionalProperties:
-                            description: StateType represents an extensible state
-                              type in the state machine.
-                            type: string
-                          description: Events represents a mapping of events and states.
-                          type: object
-                      type: object
-                    description: States represents a mapping of states and their implementations.
-                    type: object
                   version:
                     type: string
+                  workflow:
+                    properties:
+                      states:
+                        additionalProperties:
+                          description: State binds a state with an action and a set
+                            of events it can handle.
+                          properties:
+                            events:
+                              additionalProperties:
+                                description: StateType represents an extensible state
+                                  type in the state machine.
+                                type: string
+                              description: Events represents a mapping of events and
+                                states.
+                              type: object
+                          type: object
+                        description: States represents a mapping of states and their
+                          implementations.
+                        type: object
+                    required:
+                    - states
+                    type: object
                 required:
-                - states
+                - workflow
                 type: object
             type: object
           status:

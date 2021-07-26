@@ -24,12 +24,15 @@ import (
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
 // @TODO: delete from here This comes from WorkflowRunner
-
 type WorkflowDefinition struct {
-	Id      string `json:"id,omitempty"`
-	Name    string `json:"name,omitempty"`
-	Version string `json:"version,omitempty"`
-	States  States `json:"states"`
+	Id             string         `json:"id,omitempty"`
+	Name           string         `json:"name,omitempty"`
+	Version        string         `json:"version,omitempty"`
+	WorkflowStates WorkflowStates `json:"workflow"`
+}
+
+type WorkflowStates struct {
+	States States `json:"states"`
 }
 
 // States represents a mapping of states and their implementations.

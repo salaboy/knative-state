@@ -10,6 +10,36 @@ Workflow CRD defines the workflow (definition) structure that we want to track s
 
 WorkflowRun CRD represents an instance of the Workflow, as it has a reference to the Workflow definition.
 
+## Send Events to a Workflow
+
+Events are sent to a broker which automatically register triggers for the workflow definitions, when a new workflow run is created.
+
+You can send CloudEvents to the example workflow using Curl or any CloudEvents SDK
+
+
+```
+curl -X POST -H "Content-Type: application/json" \
+  -H "ce-specversion: 1.0" \
+  -H "ce-source: curl-command" \
+  -H "ce-type: JoinedQueue" \
+  -H "ce-id: 123-abc" \
+  -H "ce-workflowid: 7195cf61-ee0f-11eb-936d-c69b9fa4d91c" \
+  -d '{"name":"Salaboy"}' \
+  http://broker-ingress.knative-eventing.127.0.0.1.nip.io/default/example-broker
+
+```
+
+```
+curl -X POST -H "Content-Type: application/json" \
+  -H "ce-specversion: 1.0" \
+  -H "ce-source: curl-command" \
+  -H "ce-type: ExitedQueue" \
+  -H "ce-id: 123-abc" \
+  -H "ce-workflowid: 7195cf61-ee0f-11eb-936d-c69b9fa4d91c" \
+  -d '{"name":"Salaboy"}' \
+  http://broker-ingress.knative-eventing.127.0.0.1.nip.io/default/example-broker
+```
+
 ## CRDS
 
 Workflow (definition)

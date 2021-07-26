@@ -1,7 +1,8 @@
 apiVersion: workflow.knative.dev/v1
 kind: WorkflowRun
 metadata:
-  name: workflowrun-sample
+  name: buy-tickets-workflowrun
 spec:
-  sink: http://sockeye.default.svc.cluster.local/
+  sink: http://sockeye.default.svc.cluster.local
   workflowref: buy-tickets-workflow
+  broker: example-broker

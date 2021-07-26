@@ -30,6 +30,8 @@ type WorkflowRunSpec struct {
 
 	WorkflowRef string `json:"workflowref,omitempty"`
 
+	Broker string `json:"broker,omitempty"`
+
 	Sink string `json:"sink,omitempty"`
 }
 
@@ -37,11 +39,13 @@ type WorkflowRunSpec struct {
 type WorkflowRunStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
+	RunnerUrl string `json:"runnerurl,omitempty"`
+
+	WorkflowId string `json:"workflowid,omitempty"`
 }
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
-
 // WorkflowRun is the Schema for the workflowruns API
 type WorkflowRun struct {
 	metav1.TypeMeta   `json:",inline"`
@@ -51,7 +55,7 @@ type WorkflowRun struct {
 	Status WorkflowRunStatus `json:"status,omitempty"`
 }
 
-//+kubebuilder:object:root=true
+// +kubebuilder:object:root=true
 
 // WorkflowRunList contains a list of WorkflowRun
 type WorkflowRunList struct {
