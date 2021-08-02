@@ -6,20 +6,20 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.4.1
   creationTimestamp: null
-  name: workflowruns.workflow.knative.dev
+  name: workflowrunners.workflow.knative.dev
 spec:
   group: workflow.knative.dev
   names:
-    kind: WorkflowRun
-    listKind: WorkflowRunList
-    plural: workflowruns
-    singular: workflowrun
+    kind: WorkflowRunner
+    listKind: WorkflowRunnerList
+    plural: workflowrunners
+    singular: workflowrunner
   scope: Namespaced
   versions:
   - name: v1
     schema:
       openAPIV3Schema:
-        description: WorkflowRun is the Schema for the workflowruns API
+        description: WorkflowRunner is the Schema for the workflowrunners API
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -34,20 +34,26 @@ spec:
           metadata:
             type: object
           spec:
-            description: WorkflowRunSpec defines the desired state of WorkflowRun
+            description: WorkflowRunnerSpec defines the desired state of WorkflowRunner
             properties:
+              broker:
+                type: string
+              redisHost:
+                type: string
+              sink:
+                type: string
               workflowref:
                 type: string
             type: object
           status:
-            description: WorkflowRunStatus defines the observed state of WorkflowRun
+            description: WorkflowRunnerStatus defines the observed state of WorkflowRunner
             properties:
+              runnerId:
+                type: string
               runnerurl:
                 description: 'INSERT ADDITIONAL STATUS FIELD - define observed state
                   of cluster Important: Run "make" to regenerate code after modifying
                   this file'
-                type: string
-              workflowid:
                 type: string
             type: object
         type: object

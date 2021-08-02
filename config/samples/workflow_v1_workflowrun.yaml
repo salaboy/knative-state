@@ -3,6 +3,4 @@ kind: WorkflowRun
 metadata:
   name: buy-tickets-workflowrun
 spec:
-  sink: http://sockeye.default.svc.cluster.local
   workflowref: buy-tickets-workflow
-  broker: example-broker

@@ -1,13 +1,13 @@
-# permissions for end users to edit workflows.
+# permissions for end users to edit workflowrunners.
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: workflow-editor-role
+  name: workflowrunner-editor-role
 rules:
 - apiGroups:
   - workflow.knative.dev
   resources:
-  - workflows
+  - workflowrunners
   verbs:
   - create
   - delete
@@ -19,6 +19,6 @@ rules:
 - apiGroups:
   - workflow.knative.dev
   resources:
-  - workflows/status
+  - workflowrunners/status
   verbs:
   - get

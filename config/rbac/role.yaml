@@ -31,9 +31,9 @@ rules:
   - update
   - watch
 - apiGroups:
-  - workflow.com.salaboy
+  - workflow.knative.dev
   resources:
-  - workflows
+  - workflowrunners
   verbs:
   - create
   - delete
@@ -43,15 +43,15 @@ rules:
   - update
   - watch
 - apiGroups:
-  - workflow.com.salaboy
+  - workflow.knative.dev
   resources:
-  - workflows/finalizers
+  - workflowrunners/finalizers
   verbs:
   - update
 - apiGroups:
-  - workflow.com.salaboy
+  - workflow.knative.dev
   resources:
-  - workflows/status
+  - workflowrunners/status
   verbs:
   - get
   - patch
@@ -78,6 +78,32 @@ rules:
   - workflow.knative.dev
   resources:
   - workflowruns/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - workflow.knative.dev
+  resources:
+  - workflows
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - workflow.knative.dev
+  resources:
+  - workflows/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - workflow.knative.dev
+  resources:
+  - workflows/status
   verbs:
   - get
   - patch

@@ -23,7 +23,7 @@ curl -X POST -H "Content-Type: application/json" \
   -H "ce-source: curl-command" \
   -H "ce-type: JoinedQueue" \
   -H "ce-id: 123-abc" \
-  -H "ce-workflowid: 7195cf61-ee0f-11eb-936d-c69b9fa4d91c" \
+  -H "ce-workflowid: ccfb8921-eef9-11eb-8350-ee3241ea668d" \
   -d '{"name":"Salaboy"}' \
   http://broker-ingress.knative-eventing.127.0.0.1.nip.io/default/example-broker
 
@@ -35,7 +35,7 @@ curl -X POST -H "Content-Type: application/json" \
   -H "ce-source: curl-command" \
   -H "ce-type: ExitedQueue" \
   -H "ce-id: 123-abc" \
-  -H "ce-workflowid: 7195cf61-ee0f-11eb-936d-c69b9fa4d91c" \
+  -H "ce-workflowid: d8bafcd5-eee4-11eb-bdad-820448832986" \
   -d '{"name":"Salaboy"}' \
   http://broker-ingress.knative-eventing.127.0.0.1.nip.io/default/example-broker
 ```
@@ -44,7 +44,7 @@ curl -X POST -H "Content-Type: application/json" \
 
 Workflow (definition)
 ```
-apiVersion: workflow.com.salaboy/v1
+apiVersion: workflow.knative.dev/v1
 kind: Workflow
 metadata:
   name: buy-tickets-workflow
@@ -80,7 +80,7 @@ spec:
 WorkflowRun (instance)
 
 ```
-apiVersion: workflow.com.salaboy/v1
+apiVersion: workflow.knative.dev/v1
 kind: WorkflowRun
 metadata:
   name: workflowrun-sample

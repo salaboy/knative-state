@@ -31,10 +31,11 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
-	workflowv1 "github.com/salaboy/knative-workflow/api/v1"
-	"github.com/salaboy/knative-workflow/controllers"
 	eventingapi "knative.dev/eventing/pkg/apis/eventing/v1"
 	servingapi "knative.dev/serving/pkg/apis/serving/v1"
+
+	workflowv1 "github.com/salaboy/knative-workflow/api/v1"
+	"github.com/salaboy/knative-workflow/controllers"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -75,7 +76,7 @@ func main() {
 		Port:                   9443,
 		HealthProbeBindAddress: probeAddr,
 		LeaderElection:         enableLeaderElection,
-		LeaderElectionID:       "5af5be4e.com.salaboy",
+		LeaderElectionID:       "5af5be4e.knative.dev",
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")
@@ -94,6 +95,13 @@ func main() {
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "WorkflowRun")
+		os.Exit(1)
+	}
+	if err = (&controllers.WorkflowRunnerReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "WorkflowRunner")
 		os.Exit(1)
 	}
 	//+kubebuilder:scaffold:builder

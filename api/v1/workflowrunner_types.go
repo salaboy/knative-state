@@ -23,43 +23,55 @@ import (
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
-// WorkflowRunSpec defines the desired state of WorkflowRun
-type WorkflowRunSpec struct {
+// WorkflowRunnerSpec defines the desired state of WorkflowRunner
+type WorkflowRunnerSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 
+	// Add connection URL for Redis here??
+	// Here we should have something like RunnerConfig
+
 	WorkflowRef string `json:"workflowref,omitempty"`
+
+	Broker string `json:"broker,omitempty"`
+
+	Sink string `json:"sink,omitempty"`
+
+	RedisHost string `json:"redisHost,omitempty"`
 }
 
-// WorkflowRunStatus defines the observed state of WorkflowRun
-type WorkflowRunStatus struct {
+// WorkflowRunnerStatus defines the observed state of WorkflowRunner
+type WorkflowRunnerStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
-	RunnerUrl string `json:"runnerurl,omitempty"`
+	RunnerUrl string `json:"runnerUrl,omitempty"`
 
-	WorkflowId string `json:"workflowid,omitempty"`
+	RunnerId string `json:"runnerId,omitempty"`
+
+	BrokerUrl string `json:"brokerUrl,omitempty"`
 }
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
-// WorkflowRun is the Schema for the workflowruns API
-type WorkflowRun struct {
+
+// WorkflowRunner is the Schema for the workflowrunners API
+type WorkflowRunner struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   WorkflowRunSpec   `json:"spec,omitempty"`
-	Status WorkflowRunStatus `json:"status,omitempty"`
+	Spec   WorkflowRunnerSpec   `json:"spec,omitempty"`
+	Status WorkflowRunnerStatus `json:"status,omitempty"`
 }
 
-// +kubebuilder:object:root=true
+//+kubebuilder:object:root=true
 
-// WorkflowRunList contains a list of WorkflowRun
-type WorkflowRunList struct {
+// WorkflowRunnerList contains a list of WorkflowRunner
+type WorkflowRunnerList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []WorkflowRun `json:"items"`
+	Items           []WorkflowRunner `json:"items"`
 }
 
 func init() {
-	SchemeBuilder.Register(&WorkflowRun{}, &WorkflowRunList{})
+	SchemeBuilder.Register(&WorkflowRunner{}, &WorkflowRunnerList{})
 }
