@@ -1,13 +1,11 @@
-apiVersion: workflow.knative.dev/v1
-kind: Workflow
+apiVersion: flow.knative.dev/v1
+kind: StateMachine
 metadata:
-  name: buy-tickets-workflow
+  name: buy-tickets-statemachine
 spec:
-  workflow:
-    id: buy-tickets-workflow
-    name: buy-tickets-workflow
+  stateMachine:
     version: "1.0.0"
-    workflow:
+    stateMachineStates:
       states:
         "":
           events:

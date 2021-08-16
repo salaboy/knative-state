@@ -6,20 +6,21 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.4.1
   creationTimestamp: null
-  name: workflowrunners.workflow.knative.dev
+  name: statemachinerunners.flow.knative.dev
 spec:
-  group: workflow.knative.dev
+  group: flow.knative.dev
   names:
-    kind: WorkflowRunner
-    listKind: WorkflowRunnerList
-    plural: workflowrunners
-    singular: workflowrunner
+    kind: StateMachineRunner
+    listKind: StateMachineRunnerList
+    plural: statemachinerunners
+    singular: statemachinerunner
   scope: Namespaced
   versions:
   - name: v1
     schema:
       openAPIV3Schema:
-        description: WorkflowRunner is the Schema for the workflowrunners API
+        description: StateMachineRunner is the Schema for the statemachinerunners
+          API
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -34,7 +35,7 @@ spec:
           metadata:
             type: object
           spec:
-            description: WorkflowRunnerSpec defines the desired state of WorkflowRunner
+            description: StateMachineRunnerSpec defines the desired state of WorkflowRunner
             properties:
               broker:
                 type: string
@@ -42,15 +43,17 @@ spec:
                 type: string
               sink:
                 type: string
-              workflowref:
+              stateMachineRef:
                 type: string
             type: object
           status:
-            description: WorkflowRunnerStatus defines the observed state of WorkflowRunner
+            description: StateMachineRunnerStatus defines the observed state of WorkflowRunner
             properties:
+              brokerUrl:
+                type: string
               runnerId:
                 type: string
-              runnerurl:
+              runnerUrl:
                 description: 'INSERT ADDITIONAL STATUS FIELD - define observed state
                   of cluster Important: Run "make" to regenerate code after modifying
                   this file'

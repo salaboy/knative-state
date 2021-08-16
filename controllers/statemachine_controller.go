@@ -25,18 +25,18 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
-	workflowv1 "github.com/salaboy/knative-workflow/api/v1"
+	statev1 "github.com/salaboy/knative-state/api/v1"
 )
 
-// WorkflowReconciler reconciles a Workflow object
-type WorkflowReconciler struct {
+// StateMachineReconciler reconciles a Workflow object
+type StateMachineReconciler struct {
 	client.Client
 	Scheme *runtime.Scheme
 }
 
-//+kubebuilder:rbac:groups=workflow.knative.dev,resources=workflows,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=workflow.knative.dev,resources=workflows/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=workflow.knative.dev,resources=workflows/finalizers,verbs=update
+//+kubebuilder:rbac:groups=flow.knative.dev,resources=statemachines,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=flow.knative.dev,resources=statemachines/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=flow.knative.dev,resources=statemachines/finalizers,verbs=update
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
@@ -47,7 +47,7 @@ type WorkflowReconciler struct {
 //
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.8.3/pkg/reconcile
-func (r *WorkflowReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
+func (r *StateMachineReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	l := log.FromContext(ctx)
 
 	l.Info(fmt.Sprintf("New Workflow accepted: %v ", req.NamespacedName))
@@ -56,8 +56,8 @@ func (r *WorkflowReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 }
 
 // SetupWithManager sets up the controller with the Manager.
-func (r *WorkflowReconciler) SetupWithManager(mgr ctrl.Manager) error {
+func (r *StateMachineReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&workflowv1.Workflow{}).
+		For(&statev1.StateMachine{}).
 		Complete(r)
 }

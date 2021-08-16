@@ -7,9 +7,9 @@ metadata:
   name: manager-role
 rules:
 - apiGroups:
-  - eventing.knative.dev
+  - flow.knative.dev
   resources:
-  - triggers
+  - statemachinerunners
   verbs:
   - create
   - delete
@@ -19,9 +19,23 @@ rules:
   - update
   - watch
 - apiGroups:
-  - serving.knative.dev
+  - flow.knative.dev
   resources:
-  - services
+  - statemachinerunners/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - flow.knative.dev
+  resources:
+  - statemachinerunners/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - flow.knative.dev
+  resources:
+  - statemachines
   verbs:
   - create
   - delete
@@ -31,79 +45,15 @@ rules:
   - update
   - watch
 - apiGroups:
-  - workflow.knative.dev
+  - flow.knative.dev
   resources:
-  - workflowrunners
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - workflow.knative.dev
-  resources:
-  - workflowrunners/finalizers
+  - statemachines/finalizers
   verbs:
   - update
 - apiGroups:
-  - workflow.knative.dev
+  - flow.knative.dev
   resources:
-  - workflowrunners/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - workflow.knative.dev
-  resources:
-  - workflowruns
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - workflow.knative.dev
-  resources:
-  - workflowruns/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - workflow.knative.dev
-  resources:
-  - workflowruns/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - workflow.knative.dev
-  resources:
-  - workflows
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - workflow.knative.dev
-  resources:
-  - workflows/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - workflow.knative.dev
-  resources:
-  - workflows/status
+  - statemachines/status
   verbs:
   - get
   - patch

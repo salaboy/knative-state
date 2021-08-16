@@ -1,20 +1,20 @@
 # Knative Workflow Controller
 
-This project provides a simple controller to create Workflow Runners that can execute and track long-running process. 
+This project provides a simple controller to create StateMachine Runners that can execute and track long-running process. 
 
 This controller defines two CRDs:
-- Workflow
-- WorkflowRun
+- StateMachine
+- StateMachineRunner
 
-Workflow CRD defines the workflow (definition) structure that we want to track state about and how to transition from a state to the next. 
+StateMachine CRD defines the StateMachine (definition) structure that we want to track state about and how to transition from a state to the next. 
 
-WorkflowRun CRD represents an instance of the Workflow, as it has a reference to the Workflow definition.
+StateMachineRunner CRD represents aa runtime for a specific StateMachine definition, as it has a reference to the StateMachine definition and can host any number of StateMachineInstances.
 
-## Send Events to a Workflow
+## Send Events to a StateMachine
 
-Events are sent to a broker which automatically register triggers for the workflow definitions, when a new workflow run is created.
+Events are sent to a broker which automatically register triggers for the StateMachine definitions, when a new WorkflowRuner is created.
 
-You can send CloudEvents to the example workflow using Curl or any CloudEvents SDK
+You can send CloudEvents to the example StateMachine using `curl` or any CloudEvents SDK
 
 
 ```
@@ -23,7 +23,7 @@ curl -X POST -H "Content-Type: application/json" \
   -H "ce-source: curl-command" \
   -H "ce-type: JoinedQueue" \
   -H "ce-id: 123-abc" \
-  -H "ce-workflowid: ccfb8921-eef9-11eb-8350-ee3241ea668d" \
+  -H "ce-statemachineid: ccfb8921-eef9-11eb-8350-ee3241ea668d" \
   -d '{"name":"Salaboy"}' \
   http://broker-ingress.knative-eventing.127.0.0.1.nip.io/default/example-broker
 
@@ -35,23 +35,21 @@ curl -X POST -H "Content-Type: application/json" \
   -H "ce-source: curl-command" \
   -H "ce-type: ExitedQueue" \
   -H "ce-id: 123-abc" \
-  -H "ce-workflowid: d8bafcd5-eee4-11eb-bdad-820448832986" \
+  -H "ce-statemachineid: d8bafcd5-eee4-11eb-bdad-820448832986" \
   -d '{"name":"Salaboy"}' \
   http://broker-ingress.knative-eventing.127.0.0.1.nip.io/default/example-broker
 ```
 
 ## CRDS
 
-Workflow (definition)
+StateMachine (definition)
 ```
-apiVersion: workflow.knative.dev/v1
-kind: Workflow
+apiVersion: flow.knative.dev/v1
+kind: StateMachine
 metadata:
-  name: buy-tickets-workflow
+  name: buy-tickets-statemachine
 spec:
-  workflow:
-    id: buy-tickets-workflow
-    name: buy-tickets-workflow
+  stateMachine:
     version: "1.0.0"
     states:
       "":
@@ -77,14 +75,14 @@ spec:
 
 ```
 
-WorkflowRun (instance)
+StateMachineRunner
 
 ```
-apiVersion: workflow.knative.dev/v1
-kind: WorkflowRun
+apiVersion: flow.knative.dev/v1
+kind: StateMachineRunner
 metadata:
-  name: workflowrun-sample
+  name: buy-tickets-runner
 spec:
+  stateMachineRef: buy-tickets-buy-tickets-statemachine
   sink: http://sockeye.default.svc.cluster.local/
-  workflowref: buy-tickets-workflow
 ```

@@ -2,17 +2,15 @@
 # since it depends on service name and namespace that are out of this kustomize package.
 # It should be run by config/default
 resources:
-- bases/workflow.knative.dev_workflows.yaml
-- bases/workflow.knative.dev_workflowruns.yaml
-- bases/workflow.knative.dev_workflowrunners.yaml
+- bases/flow.knative.dev_statemachines.yaml
+- bases/flow.knative.dev_statemachinerunners.yaml
 #+kubebuilder:scaffold:crdkustomizeresource
 
 patchesStrategicMerge:
 # [WEBHOOK] To enable webhook, uncomment all the sections with [WEBHOOK] prefix.
 # patches here are for enabling the conversion webhook for each CRD
-#- patches/webhook_in_workflows.yaml
-#- patches/webhook_in_workflowruns.yaml
-#- patches/webhook_in_workflowrunners.yaml
+#- patches/webhook_in_statemachines.yaml
+#- patches/webhook_in_statemachinerunners.yaml
 #+kubebuilder:scaffold:crdkustomizewebhookpatch
 
 # [CERTMANAGER] To enable webhook, uncomment all the sections with [CERTMANAGER] prefix.

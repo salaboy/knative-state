@@ -1,0 +1,8 @@
+apiVersion: flow.knative.dev/v1
+kind: StateMachineRunner
+metadata:
+  name: statemachinerunner-sample
+spec:
+  sink: http://sockeye.default.svc.cluster.local
+  stateMachineRef: buy-tickets-statemachine
+  broker: example-broker

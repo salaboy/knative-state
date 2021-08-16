@@ -34,8 +34,8 @@ import (
 	eventingapi "knative.dev/eventing/pkg/apis/eventing/v1"
 	servingapi "knative.dev/serving/pkg/apis/serving/v1"
 
-	workflowv1 "github.com/salaboy/knative-workflow/api/v1"
-	"github.com/salaboy/knative-workflow/controllers"
+	statev1 "github.com/salaboy/knative-state/api/v1"
+	"github.com/salaboy/knative-state/controllers"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -47,7 +47,7 @@ var (
 func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 
-	utilruntime.Must(workflowv1.AddToScheme(scheme))
+	utilruntime.Must(statev1.AddToScheme(scheme))
 	utilruntime.Must(eventingapi.AddToScheme(scheme))
 	utilruntime.Must(servingapi.AddToScheme(scheme))
 	//+kubebuilder:scaffold:scheme
@@ -83,25 +83,19 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err = (&controllers.WorkflowReconciler{
+	if err = (&controllers.StateMachineReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "Workflow")
+		setupLog.Error(err, "unable to create controller", "controller", "StateMachine")
 		os.Exit(1)
 	}
-	if err = (&controllers.WorkflowRunReconciler{
+
+	if err = (&controllers.StateMachineRunnerReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "WorkflowRun")
-		os.Exit(1)
-	}
-	if err = (&controllers.WorkflowRunnerReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "WorkflowRunner")
+		setupLog.Error(err, "unable to create controller", "controller", "StateMachineRunner")
 		os.Exit(1)
 	}
 	//+kubebuilder:scaffold:builder

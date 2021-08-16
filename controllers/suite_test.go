@@ -30,7 +30,7 @@ import (
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
-	workflowv1 "github.com/salaboy/knative-workflow/api/v1"
+	workflowv1 "github.com/salaboy/knative-state/api/v1"
 	//+kubebuilder:scaffold:imports
 )
 

@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"github.com/ghodss/yaml"
 	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	eventingapi "knative.dev/eventing/pkg/apis/eventing/v1"
@@ -29,6 +30,7 @@ import (
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 	servingapi "knative.dev/serving/pkg/apis/serving/v1"
 	knativeServingClient "knative.dev/serving/pkg/client/clientset/versioned"
+	"os"
 	"strings"
 
 	"k8s.io/apimachinery/pkg/runtime"
@@ -36,20 +38,22 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
-	workflowv1 "github.com/salaboy/knative-workflow/api/v1"
+	statev1 "github.com/salaboy/knative-state/api/v1"
 )
 
-// WorkflowRunnerReconciler reconciles a WorkflowRunner object
-type WorkflowRunnerReconciler struct {
+var RUNNER_IMAGE = os.Getenv("RUNNER_IMAGE")
+
+// StateMachineRunnerReconciler reconciles a WorkflowRunner object
+type StateMachineRunnerReconciler struct {
 	client.Client
 	Scheme                *runtime.Scheme
 	knativeServingClient  *knativeServingClient.Clientset
 	knativeEventingClient *knativeEventingClient.Clientset
 }
 
-//+kubebuilder:rbac:groups=workflow.knative.dev,resources=workflowrunners,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=workflow.knative.dev,resources=workflowrunners/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=workflow.knative.dev,resources=workflowrunners/finalizers,verbs=update
+//+kubebuilder:rbac:groups=flow.knative.dev,resources=statemachinerunners,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=flow.knative.dev,resources=statemachinerunners/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=flow.knative.dev,resources=statemachinerunners/finalizers,verbs=update
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
@@ -64,21 +68,21 @@ type WorkflowRunnerReconciler struct {
 // Reconciling a new WorkflowRunner should:
 // - Check if the WorkflowRef exists, if not fail and do nothing
 // - If the WorkflowRef exists, fetch it and then:
-//   - Check if there is no WorkflowRunner for the pair (workflow + version)
+//   - Check if there is no StateMachineRunner for the pair (workflow + version)
 //      - if not:
 //        - Create the Runner Knative Service with the name specificed in the runner, the name should include the version
 //          - Create a dedicated broker for the runner
 //      - if yes:
 //        - do nothing, but fetch the broker
-//   	- Create Triggers for Events based on the WorkflowRef on the dedicated broker
+//   	- Create Triggers for Events based on the StateMachineRef on the dedicated broker
 //
 
-func (r *WorkflowRunnerReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
+func (r *StateMachineRunnerReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := log.FromContext(ctx)
 
-	var workflowRunner workflowv1.WorkflowRunner
+	var stateMachineRunner statev1.StateMachineRunner
 
-	if err := r.Get(ctx, req.NamespacedName, &workflowRunner); err != nil {
+	if err := r.Get(ctx, req.NamespacedName, &stateMachineRunner); err != nil {
 		// it might be not found if this is a delete request
 		if ignoreNotFound(err) == nil {
 			log.Info("Hey there.. deleting workflowrunner happened: " + req.NamespacedName.Name)
@@ -90,28 +94,28 @@ func (r *WorkflowRunnerReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 		return ctrl.Result{}, err
 	}
 
-	if workflowRunner.Spec.WorkflowRef != "" {
-		var workflow workflowv1.Workflow
+	if stateMachineRunner.Spec.StateMachineRef != "" {
+		var stateMachine statev1.StateMachine
 		if err := r.Get(ctx, types.NamespacedName{
 			Namespace: "default",
-			Name:      workflowRunner.Spec.WorkflowRef,
-		}, &workflow); err != nil {
+			Name:      stateMachineRunner.Spec.StateMachineRef,
+		}, &stateMachine); err != nil {
 			// it might be not found if this is a delete request
 
 			return ctrl.Result{}, err
 		}
 
-		yamlStates, err := yaml.Marshal(workflow.Spec.WorkflowDefinition.WorkflowStates)
+		yamlStates, err := yaml.Marshal(stateMachine.Spec.StateMachineDefinition.StateMachineStates)
 		if err != nil {
-			log.Error(err, "failed to parse yaml from workflow definition states")
+			log.Error(err, "failed to parse yaml from statemachine definition states")
 			return ctrl.Result{}, err
 		}
 		if RUNNER_IMAGE == "" {
-			RUNNER_IMAGE = "kind.local/knative-workflow-runner-ddfac3ccbf87482f858add851df61835:5a7b7aa766d0e97c76431442d225d28fe72908b69f2216fa49fecb46ab0c7b8b"
+			RUNNER_IMAGE = "kind.local/knative-statemachine-runner-ddfac3ccbf87482f858add851df61835:c8e620dacc920322d0d0c414a748d970a939ec416c667868e15f5809d7174651"
 		}
 		service := &servingapi.Service{
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      "kservice-" + workflow.Name,
+				Name:      "kservice-" + stateMachine.Name,
 				Namespace: "default",
 			},
 			Spec: servingapi.ServiceSpec{
@@ -134,11 +138,11 @@ func (r *WorkflowRunnerReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 										Env: []v1.EnvVar{
 											v1.EnvVar{
 												Name:  "WORKFLOW_NAME",
-												Value: workflow.Spec.WorkflowDefinition.Name,
+												Value: stateMachine.Spec.StateMachineDefinition.Name,
 											},
 											v1.EnvVar{
 												Name:  "WORKFLOW_VERSION",
-												Value: workflow.Spec.WorkflowDefinition.Version,
+												Value: stateMachine.Spec.StateMachineDefinition.Version,
 											},
 											v1.EnvVar{
 												Name:  "WORKFLOW_DEF",
@@ -146,11 +150,11 @@ func (r *WorkflowRunnerReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 											},
 											v1.EnvVar{
 												Name:  "EVENT_SINK",
-												Value: workflowRunner.Spec.Sink,
+												Value: stateMachineRunner.Spec.Sink,
 											},
 											v1.EnvVar{
 												Name:  "REDIS_HOST",
-												Value: workflowRunner.Spec.Sink,
+												Value: stateMachineRunner.Spec.RedisHost,
 											},
 										},
 									},
@@ -167,7 +171,7 @@ func (r *WorkflowRunnerReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 			if ignoreNotFound(err) == nil {
 				log.Info("KService doesn't exist, so creating KService: " + service.Name)
 				_, err := ctrl.CreateOrUpdate(ctx, r.Client, service, func() error {
-					return ctrl.SetControllerReference(&workflowRunner, service, r.Scheme)
+					return ctrl.SetControllerReference(&stateMachineRunner, service, r.Scheme)
 				})
 				if err != nil {
 					log.Error(err, "Error Creating or Updating and Setting Controller References to Knative Service: "+service.Name)
@@ -191,18 +195,18 @@ func (r *WorkflowRunnerReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 				//
 
 				// Create Triggers for Workflow definition
-				for stateType, _ := range workflow.Spec.WorkflowDefinition.WorkflowStates.States {
+				for stateType, _ := range stateMachine.Spec.StateMachineDefinition.StateMachineStates.States {
 					log.Info("> Looking for Events in State : " + string(stateType))
 					// Create triggers for events that the workflow is waiting for
-					for eventName, _ := range workflow.Spec.WorkflowDefinition.WorkflowStates.States[stateType].Events {
+					for eventName, _ := range stateMachine.Spec.StateMachineDefinition.StateMachineStates.States[stateType].Events {
 						log.Info("> Creating trigger for Event: " + string(eventName) + " in State : " + string(stateType))
 						trigger := &eventingapi.Trigger{
 							ObjectMeta: metav1.ObjectMeta{
-								Name:      strings.ToLower("t-" + workflow.Name + "-" + string(eventName)),
+								Name:      strings.ToLower("t-" + stateMachine.Name + "-" + string(eventName)),
 								Namespace: "default",
 							},
 							Spec: eventingapi.TriggerSpec{
-								Broker: workflowRunner.Spec.Broker,
+								Broker: stateMachineRunner.Spec.Broker,
 								Filter: &eventingapi.TriggerFilter{
 									Attributes: map[string]string{
 										"type": string(eventName),
@@ -214,7 +218,7 @@ func (r *WorkflowRunnerReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 							},
 						}
 						_, err := ctrl.CreateOrUpdate(ctx, r.Client, trigger, func() error {
-							return ctrl.SetControllerReference(&workflowRunner, trigger, r.Scheme)
+							return ctrl.SetControllerReference(&stateMachineRunner, trigger, r.Scheme)
 						})
 						if err != nil {
 							log.Error(err, "Error Creating or Updating and Setting Controller References to Knative Trigger: "+trigger.Name)
@@ -226,11 +230,11 @@ func (r *WorkflowRunnerReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 				for _, condition := range serviceExist.Status.Conditions {
 					if condition.Type == apis.ConditionReady {
 						log.Info("Runner Ready! ")
-						workflowRunner.Status.RunnerUrl = "http://" + serviceExist.Name + ".default.127.0.0.1.nip.io"
-						workflowRunner.Status.RunnerId = "" // Need to fetch the ID from the Info endpoint
-						workflowRunner.Status.BrokerUrl = "" // Need to check if the broker is up and add the URL here
-						if err := r.Status().Update(ctx, &workflowRunner); err != nil {
-							log.Error(err, "unable to update WorkflowRunner status")
+						stateMachineRunner.Status.RunnerUrl = "http://" + serviceExist.Name + ".default.127.0.0.1.nip.io"
+						stateMachineRunner.Status.RunnerId = ""  // Need to fetch the ID from the Info endpoint
+						stateMachineRunner.Status.BrokerUrl = "" // Need to check if the broker is up and add the URL here
+						if err := r.Status().Update(ctx, &stateMachineRunner); err != nil {
+							log.Error(err, "unable to update StateMachineRunner status")
 							return ctrl.Result{}, err
 						}
 					}
@@ -247,12 +251,19 @@ func (r *WorkflowRunnerReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 }
 
 // SetupWithManager sets up the controller with the Manager.
-func (r *WorkflowRunnerReconciler) SetupWithManager(mgr ctrl.Manager) error {
+func (r *StateMachineRunnerReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	r.knativeServingClient = knativeServingClient.NewForConfigOrDie(mgr.GetConfig())
 	r.knativeEventingClient = knativeEventingClient.NewForConfigOrDie(mgr.GetConfig())
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&workflowv1.WorkflowRunner{}).
+		For(&statev1.StateMachineRunner{}).
 		Owns(&servingapi.Service{}).
 		Owns(&eventingapi.Trigger{}).
 		Complete(r)
+}
+
+func ignoreNotFound(err error) error {
+	if errors.IsNotFound(err) {
+		return nil
+	}
+	return err
 }

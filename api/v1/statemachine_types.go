@@ -23,15 +23,15 @@ import (
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
-// @TODO: delete from here This comes from WorkflowRunner
-type WorkflowDefinition struct {
-	Id             string         `json:"id,omitempty"`
-	Name           string         `json:"name,omitempty"`
-	Version        string         `json:"version,omitempty"`
-	WorkflowStates WorkflowStates `json:"workflow"`
+// @TODO: delete from here This comes from StateMachineRunner
+type StateMachineDefinition struct {
+	Id                 string             `json:"id,omitempty"`
+	Name               string             `json:"name,omitempty"`
+	Version            string             `json:"version,omitempty"`
+	StateMachineStates StateMachineStates `json:"stateMachineStates"`
 }
 
-type WorkflowStates struct {
+type StateMachineStates struct {
 	States States `json:"states"`
 }
 
@@ -52,18 +52,18 @@ type StateType string
 // EventType represents an extensible event type in the state machine.
 type EventType string
 
-// @TODO: delete from here This comes from WorkflowRunner
+// @TODO: delete from here This comes from StateMachineRunner
 
-// WorkflowSpec defines the desired state of Workflow
-type WorkflowSpec struct {
+// StateMachineSpec defines the desired state of Workflow
+type StateMachineSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 
-	WorkflowDefinition WorkflowDefinition `json:"workflow,omitempty"`
+	StateMachineDefinition StateMachineDefinition `json:"stateMachine,omitempty"`
 }
 
-// WorkflowStatus defines the observed state of Workflow
-type WorkflowStatus struct {
+// StateMachineStatus defines the observed state of Workflow
+type StateMachineStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 }
@@ -71,24 +71,24 @@ type WorkflowStatus struct {
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
 
-// Workflow is the Schema for the workflows API
-type Workflow struct {
+// StateMachine is the Schema for the workflows API
+type StateMachine struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   WorkflowSpec   `json:"spec,omitempty"`
-	Status WorkflowStatus `json:"status,omitempty"`
+	Spec   StateMachineSpec   `json:"spec,omitempty"`
+	Status StateMachineStatus `json:"status,omitempty"`
 }
 
 //+kubebuilder:object:root=true
 
-// WorkflowList contains a list of Workflow
-type WorkflowList struct {
+// StateMachineList contains a list of Workflow
+type StateMachineList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []Workflow `json:"items"`
+	Items           []StateMachine `json:"items"`
 }
 
 func init() {
-	SchemeBuilder.Register(&Workflow{}, &WorkflowList{})
+	SchemeBuilder.Register(&StateMachine{}, &StateMachineList{})
 }

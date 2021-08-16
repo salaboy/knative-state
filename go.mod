@@ -1,4 +1,4 @@
-module github.com/salaboy/knative-workflow
+module github.com/salaboy/knative-state
 
 go 1.15
 

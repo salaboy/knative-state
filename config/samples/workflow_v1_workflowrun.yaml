@@ -1,6 +1,0 @@
-apiVersion: workflow.knative.dev/v1
-kind: WorkflowRun
-metadata:
-  name: buy-tickets-workflowrun
-spec:
-  workflowref: buy-tickets-workflow

@@ -6,20 +6,20 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.4.1
   creationTimestamp: null
-  name: workflows.workflow.knative.dev
+  name: statemachines.flow.knative.dev
 spec:
-  group: workflow.knative.dev
+  group: flow.knative.dev
   names:
-    kind: Workflow
-    listKind: WorkflowList
-    plural: workflows
-    singular: workflow
+    kind: StateMachine
+    listKind: StateMachineList
+    plural: statemachines
+    singular: statemachine
   scope: Namespaced
   versions:
   - name: v1
     schema:
       openAPIV3Schema:
-        description: Workflow is the Schema for the workflows API
+        description: StateMachine is the Schema for the workflows API
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -34,10 +34,10 @@ spec:
           metadata:
             type: object
           spec:
-            description: WorkflowSpec defines the desired state of Workflow
+            description: StateMachineSpec defines the desired state of Workflow
             properties:
-              workflow:
-                description: '@TODO: delete from here This comes from WorkflowRunner'
+              statemachine:
+                description: '@TODO: delete from here This comes from StateMachineRunner'
                 properties:
                   id:
                     type: string
@@ -72,7 +72,7 @@ spec:
                 type: object
             type: object
           status:
-            description: WorkflowStatus defines the observed state of Workflow
+            description: StateMachineStatus defines the observed state of Workflow
             type: object
         type: object
     served: true
