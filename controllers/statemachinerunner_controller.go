@@ -105,13 +105,13 @@ func (r *StateMachineRunnerReconciler) Reconcile(ctx context.Context, req ctrl.R
 			return ctrl.Result{}, err
 		}
 
-		yamlStates, err := yaml.Marshal(stateMachine.Spec.StateMachineDefinition.StateMachineStates)
+		yamlStates, err := yaml.Marshal(stateMachine.Spec.StateMachineDefinition.StateMachineStates.States)
 		if err != nil {
 			log.Error(err, "failed to parse yaml from statemachine definition states")
 			return ctrl.Result{}, err
 		}
 		if RUNNER_IMAGE == "" {
-			RUNNER_IMAGE = "kind.local/knative-statemachine-runner-ddfac3ccbf87482f858add851df61835:c8e620dacc920322d0d0c414a748d970a939ec416c667868e15f5809d7174651"
+			RUNNER_IMAGE = "kind.local/knative-statemachine-runner-7a3c815d2bf3ebf9af9650f7624a29c9:93b9adcd6af50be3ba7f7b4848c79da214c0b4dcca39709c98c28905eb91b6a0"
 		}
 		service := &servingapi.Service{
 			ObjectMeta: metav1.ObjectMeta{
@@ -133,19 +133,19 @@ func (r *StateMachineRunnerReconciler) Reconcile(ctx context.Context, req ctrl.R
 
 								Containers: []v1.Container{
 									v1.Container{
-										Name:  "knative-workflow-runner",
+										Name:  "knative-statemachine-runner",
 										Image: RUNNER_IMAGE,
 										Env: []v1.EnvVar{
 											v1.EnvVar{
-												Name:  "WORKFLOW_NAME",
-												Value: stateMachine.Spec.StateMachineDefinition.Name,
+												Name:  "STATEMACHINE_NAME",
+												Value: stateMachine.Name,
 											},
 											v1.EnvVar{
-												Name:  "WORKFLOW_VERSION",
+												Name:  "STATEMACHINE_VERSION",
 												Value: stateMachine.Spec.StateMachineDefinition.Version,
 											},
 											v1.EnvVar{
-												Name:  "WORKFLOW_DEF",
+												Name:  "STATEMACHINE_DEF",
 												Value: fmt.Sprintf("%s", yamlStates),
 											},
 											v1.EnvVar{
@@ -184,7 +184,7 @@ func (r *StateMachineRunnerReconciler) Reconcile(ctx context.Context, req ctrl.R
 			if serviceExist.Status.URL != nil {
 
 				log.Info("> Created KService URL for subscriber : " + serviceExist.Status.URL.String())
-				parsedURL, err := apis.ParseURL("http://" + serviceExist.Name + ".default.svc.cluster.local" + "/workflows/events")
+				parsedURL, err := apis.ParseURL("http://" + serviceExist.Name + ".default.svc.cluster.local" + "/statemachines/events")
 				if err != nil {
 					log.Error(err, "Error Parsing URl for: "+serviceExist.Status.URL.String())
 					return ctrl.Result{}, err

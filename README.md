@@ -12,7 +12,26 @@ StateMachineRunner CRD represents aa runtime for a specific StateMachine definit
 
 ## Send Events to a StateMachine
 
-Events are sent to a broker which automatically register triggers for the StateMachine definitions, when a new WorkflowRuner is created.
+Events are sent to a broker which automatically register triggers for the StateMachine definitions, when a new StateMachineRuner is created.
+Find the StateMachineRunner URL by running: 
+```bigquery
+kubectl get ksvc 
+```
+or
+```bigquery
+kubectl get statemachinerunner
+```
+Create a new StateMachineInstance by sending a request to the StateMachineRunner:
+
+```
+curl -X POST http://kservice-buy-tickets-statemachine.default.127.0.0.1.nip.io/statemachines
+
+```
+
+You should get something like this: 
+```
+{"id":"37718d5c-fe8a-11eb-bad7-ceed770ffae2","current":"","context":null}%
+```
 
 You can send CloudEvents to the example StateMachine using `curl` or any CloudEvents SDK
 
@@ -23,7 +42,7 @@ curl -X POST -H "Content-Type: application/json" \
   -H "ce-source: curl-command" \
   -H "ce-type: JoinedQueue" \
   -H "ce-id: 123-abc" \
-  -H "ce-statemachineid: ccfb8921-eef9-11eb-8350-ee3241ea668d" \
+  -H "ce-statemachineid: 5c0eeb45-fe8c-11eb-847b-e65959342a48" \
   -d '{"name":"Salaboy"}' \
   http://broker-ingress.knative-eventing.127.0.0.1.nip.io/default/example-broker
 

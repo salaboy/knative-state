@@ -25,8 +25,6 @@ import (
 
 // @TODO: delete from here This comes from StateMachineRunner
 type StateMachineDefinition struct {
-	Id                 string             `json:"id,omitempty"`
-	Name               string             `json:"name,omitempty"`
 	Version            string             `json:"version,omitempty"`
 	StateMachineStates StateMachineStates `json:"stateMachineStates"`
 }

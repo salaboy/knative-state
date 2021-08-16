@@ -36,16 +36,10 @@ spec:
           spec:
             description: StateMachineSpec defines the desired state of Workflow
             properties:
-              statemachine:
+              stateMachine:
                 description: '@TODO: delete from here This comes from StateMachineRunner'
                 properties:
-                  id:
-                    type: string
-                  name:
-                    type: string
-                  version:
-                    type: string
-                  workflow:
+                  stateMachineStates:
                     properties:
                       states:
                         additionalProperties:
@@ -67,8 +61,10 @@ spec:
                     required:
                     - states
                     type: object
+                  version:
+                    type: string
                 required:
-                - workflow
+                - stateMachineStates
                 type: object
             type: object
           status:
